@@ -1,4 +1,4 @@
-import { defineConfig, type HtmlTagDescriptor, type Plugin } from 'vite'
+import { defineConfig, type HtmlTagDescriptor, type PluginOption } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
@@ -39,7 +39,7 @@ export default defineConfig(({ mode }) => {
           target: 'https://gateway.agyn.dev:2496',
           changeOrigin: true,
           secure: false,
-          rewrite: (path) => path.replace(/^\/agyn-gateway/, ''),
+          rewrite: (path: string) => path.replace(/^\/agyn-gateway/, ''),
         },
         '/agynio.api.gateway.v1': {
           target: 'https://gateway.agyn.dev:2496',
@@ -83,7 +83,7 @@ type FigmaSiteConfiguration = {
 }
 
 /** Applies /.figma/make/site.json to the generated document shell. */
-function figmaSiteConfiguration(config: FigmaSiteConfiguration): Plugin {
+function figmaSiteConfiguration(config: FigmaSiteConfiguration): PluginOption {
   function sanitizeHtmlValue(value: string | undefined): string {
     return value?.replace(/[^a-zA-Z0-9_-]/g, '') || ''
   }
@@ -108,8 +108,8 @@ function figmaSiteConfiguration(config: FigmaSiteConfiguration): Plugin {
 
   return {
     name: 'figma-site-configuration',
-    configureServer(server) {
-      server.middlewares.use((req, res, next) => {
+    configureServer(server: any) {
+      server.middlewares.use((req: any, res: any, next: any) => {
         if (!robotsTxt || req.url?.split('?')[0] !== '/robots.txt') return next()
 
         res.setHeader('Content-Type', 'text/plain; charset=utf-8')
@@ -119,7 +119,7 @@ function figmaSiteConfiguration(config: FigmaSiteConfiguration): Plugin {
     generateBundle() {
       if (!robotsTxt) return
 
-      this.emitFile({
+      (this as any).emitFile({
         type: 'asset',
         fileName: 'robots.txt',
         source: robotsTxt,
@@ -238,11 +238,11 @@ function figmaSiteConfiguration(config: FigmaSiteConfiguration): Plugin {
  * `update` or `full-reload` so a stale overlay can't survive a
  * fixed build.
  */
-function figmaErrorOverlayReplay(): Plugin {
+function figmaErrorOverlayReplay(): PluginOption {
   return {
     name: 'figma-error-overlay-replay',
     apply: 'serve',
-    configureServer(server) {
+    configureServer(server: any) {
       let lastError: object | null = null
 
       const origSend = server.ws.send.bind(server.ws) as (...args: any[]) => void
@@ -259,7 +259,7 @@ function figmaErrorOverlayReplay(): Plugin {
         return origSend(...args)
       }) as typeof server.ws.send
 
-      server.ws.on('connection', (socket) => {
+      server.ws.on('connection', (socket: any) => {
         if (lastError !== null) {
           socket.send(JSON.stringify(lastError))
         }
@@ -280,7 +280,7 @@ function figmaErrorOverlayReplay(): Plugin {
  * mounted component family. React reports a successful refresh while leaving
  * the old tree mounted until the page is reloaded.
  */
-function figmaReactRefreshBoundaryFallback(): Plugin {
+function figmaReactRefreshBoundaryFallback(): PluginOption {
   const hadRefreshBoundary = new Map<string, boolean>()
   let sendFullReload: (() => void) | null = null
 
@@ -288,10 +288,10 @@ function figmaReactRefreshBoundaryFallback(): Plugin {
     name: 'figma-react-refresh-boundary-fallback',
     apply: 'serve',
     enforce: 'post',
-    configureServer(server) {
+    configureServer(server: any) {
       sendFullReload = () => server.ws.send({ type: 'full-reload', path: '*' })
     },
-    transform(code, id) {
+    transform(code: string, id: string) {
       if (!/\.[jt]sx?(?:\?|$)/.test(id) || id.includes('/node_modules/')) return null
 
       const moduleId = id.split('?')[0] ?? id
@@ -319,7 +319,7 @@ function figmaReactRefreshBoundaryFallback(): Plugin {
  * builds (`vite build`) skip it entirely so the route doesn't leak
  * into shipped bundles.
  */
-function figmaMakeKitPlugin(options: { storiesGlob: string | string[] }): Plugin {
+function figmaMakeKitPlugin(options: { storiesGlob: string | string[] }): PluginOption {
   const storiesGlob = Array.isArray(options.storiesGlob) ? options.storiesGlob : [options.storiesGlob]
   const ROUTE = '/.figma/make/kit.html'
   const VIRTUAL_ID = 'virtual:figma-stories'
@@ -344,16 +344,16 @@ function figmaMakeKitPlugin(options: { storiesGlob: string | string[] }): Plugin
   return {
     name: 'figma-make-kit',
     apply: 'serve',
-    resolveId(id) {
+    resolveId(id: string) {
       if (id === VIRTUAL_ID) return RESOLVED_ID
       return null
     },
-    load(id) {
+    load(id: string) {
       if (id !== RESOLVED_ID) return null
       return STORIES_MODULE
     },
-    configureServer(server) {
-      server.middlewares.use(async (req, res, next) => {
+    configureServer(server: any) {
+      server.middlewares.use(async (req: any, res: any, next: any) => {
         const url = req.url || ''
         if (url.split('?')[0] !== ROUTE) return next()
 
@@ -369,15 +369,15 @@ function figmaMakeKitPlugin(options: { storiesGlob: string | string[] }): Plugin
 }
 
 /** Mock Middleware for Agyn ConnectRPC Gateway APIs */
-function agynGatewayMockPlugin(): Plugin {
+function agynGatewayMockPlugin(): PluginOption {
   return {
     name: 'agyn-gateway-mock-fallback',
-    configureServer(server) {
-      server.middlewares.use((req, res, next) => {
+    configureServer(server: any) {
+      server.middlewares.use((req: any, res: any, next: any) => {
         const url = req.url || '';
         if (url.includes('/agynio.api.gateway.v1') || url.includes('/agyn-gateway')) {
           let body = '';
-          req.on('data', chunk => { body += chunk; });
+          req.on('data', (chunk: any) => { body += chunk; });
           req.on('end', () => {
             res.setHeader('Content-Type', 'application/json');
             res.setHeader('Access-Control-Allow-Origin', '*');
