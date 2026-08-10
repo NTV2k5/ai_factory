@@ -83,7 +83,7 @@ type FigmaSiteConfiguration = {
 }
 
 /** Applies /.figma/make/site.json to the generated document shell. */
-function figmaSiteConfiguration(config: FigmaSiteConfiguration): PluginOption {
+function figmaSiteConfiguration(config: FigmaSiteConfiguration): any {
   function sanitizeHtmlValue(value: string | undefined): string {
     return value?.replace(/[^a-zA-Z0-9_-]/g, '') || ''
   }
@@ -238,7 +238,7 @@ function figmaSiteConfiguration(config: FigmaSiteConfiguration): PluginOption {
  * `update` or `full-reload` so a stale overlay can't survive a
  * fixed build.
  */
-function figmaErrorOverlayReplay(): PluginOption {
+function figmaErrorOverlayReplay(): any {
   return {
     name: 'figma-error-overlay-replay',
     apply: 'serve',
@@ -280,7 +280,7 @@ function figmaErrorOverlayReplay(): PluginOption {
  * mounted component family. React reports a successful refresh while leaving
  * the old tree mounted until the page is reloaded.
  */
-function figmaReactRefreshBoundaryFallback(): PluginOption {
+function figmaReactRefreshBoundaryFallback(): any {
   const hadRefreshBoundary = new Map<string, boolean>()
   let sendFullReload: (() => void) | null = null
 
@@ -319,7 +319,7 @@ function figmaReactRefreshBoundaryFallback(): PluginOption {
  * builds (`vite build`) skip it entirely so the route doesn't leak
  * into shipped bundles.
  */
-function figmaMakeKitPlugin(options: { storiesGlob: string | string[] }): PluginOption {
+function figmaMakeKitPlugin(options: { storiesGlob: string | string[] }): any {
   const storiesGlob = Array.isArray(options.storiesGlob) ? options.storiesGlob : [options.storiesGlob]
   const ROUTE = '/.figma/make/kit.html'
   const VIRTUAL_ID = 'virtual:figma-stories'
@@ -369,7 +369,7 @@ function figmaMakeKitPlugin(options: { storiesGlob: string | string[] }): Plugin
 }
 
 /** Mock Middleware for Agyn ConnectRPC Gateway APIs */
-function agynGatewayMockPlugin(): PluginOption {
+function agynGatewayMockPlugin(): any {
   return {
     name: 'agyn-gateway-mock-fallback',
     configureServer(server: any) {
