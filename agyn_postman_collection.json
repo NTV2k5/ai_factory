@@ -1,0 +1,12 @@
+{
+  "info": {
+    "name": "Agyn AI Factory API Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get Tasks",
+      "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/v1/tasks" } }
+    }
+  ]
+}
