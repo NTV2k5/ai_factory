@@ -127,7 +127,7 @@ function figmaSiteConfiguration(config: FigmaSiteConfiguration): any {
     },
     transformIndexHtml: {
       order: 'pre',
-      handler(html) {
+      handler(html: string) {
         let result = html
         result = replaceHtmlCommentSlot(result, 'figma:lang', language)
         result = replaceHtmlCommentSlot(result, 'figma:title', escapeHtmlText(title))
