@@ -1,37 +1,47 @@
 import React, { createContext, useContext, useState } from 'react';
 
-interface User {
+export type UserRole = 'Admin' | 'PO Lead' | 'User';
+
+export interface User {
   id: string;
   name: string;
   email: string;
-  role: string;
+  role: UserRole;
+  avatar?: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string) => void;
+  login: (email: string, password: string, role?: UserRole) => void;
   logout: () => void;
   isAuthenticated: boolean;
+  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>({
-    id: 'usr_01',
-    name: 'Senior Engineer',
-    email: 'admin@aifactory.ai',
-    role: 'Lead Architect',
-  });
+  const [user, setUser] = useState<User | null>(null);
 
-  const login = (email: string) => {
-    setUser({ id: 'usr_01', name: email.split('@')[0], email, role: 'Engineer' });
+  const login = (email: string, _password: string, role: UserRole = 'User') => {
+    setUser({
+      id: `usr_${Date.now()}`,
+      name: email.split('@')[0],
+      email,
+      role,
+    });
   };
 
   const logout = () => setUser(null);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{
+      user,
+      login,
+      logout,
+      isAuthenticated: !!user,
+      isAdmin: user?.role === 'Admin' || user?.role === 'PO Lead',
+    }}>
       {children}
     </AuthContext.Provider>
   );

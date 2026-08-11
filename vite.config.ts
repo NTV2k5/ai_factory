@@ -50,6 +50,11 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
         },
+        '/api/agynio.api': {
+          target: 'https://gateway.agyn.dev:2496',
+          changeOrigin: true,
+          secure: false,
+        },
       },
     },
     preview: {
