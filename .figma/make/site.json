@@ -1,0 +1,10 @@
+{
+  "description": "Streamlines design projects by ensuring accurate adherence to detailed descriptions, helping designers deliver precise and efficient results.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
