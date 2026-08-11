@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { cn } from '../../App';
+import { cn } from '../../utils/cn';
 
 export interface BadgeProps {
   children: ReactNode;
